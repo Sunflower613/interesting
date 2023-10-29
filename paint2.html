@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Color Picker and Continuous Drawing</title>
+    <style>
+        body {
+            background-color: hsl(38, 67%, 52%);
+        }
+
+        #canvas {
+            width: 50%;
+            height: 200px;
+            margin: auto;
+            margin-top: 50px;
+            margin-bottom: 50px;
+            border: 1px solid black;
+            background-color: transparent;
+            user-select: none;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        .margin-auto {
+            width: 100%;
+            max-width: 600px;
+            margin: auto;
+            text-align: center;
+            border: 1px solid black;
+            align-items: center;
+            background-image: url(palette.png);
+            /* background-color: rgb(250, 216, 152);*/
+        }
+
+        button {
+            border-radius: 100%;
+            height: 50px;
+            width: 50px;
+            color: white;
+            border: 1px solid black;
+        }
+
+        .target-div {
+            width: 100%;
+            height: 100px;
+            margin-top: 30px;
+        }
+
+        #target-color {
+            width: 40%;
+            border: 1px solid black;
+            background-color: white;
+            color: #000;
+            height: 100%;
+            text-align: center;
+            line-height: 100px;
+            display: inline-block;
+            vertical-align: middle;
+        }
+
+        .between {
+            display: flex;
+            justify-content: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="display" class="margin-auto">
+
+        <div class="target-div">
+            <div id="target-color">Target Color</div>
+            <button id="reno" onclick="reno()" style="background-color:hsl(124, 100%, 37%);">reno</button>
+        </div>
+
+
+        <span id="cr">cr</span><br>
+
+        <!-- <span id="c1">c1</span><br>
+        <span id="c2">c2</span><br>
+        <span id="resultDisplay">mix</span><br>
+        <span id="hd">hd</span><br> -->
+        
+        <br>
+        <div class="between">
+            <div>
+                <span>ymsk</span>
+                <button id="red" onclick="choose(this.style.backgroundColor)"
+                    style="background-color:hsl(328, 100%, 54%);">Red</button>
+                <button id="yellow" onclick="choose(this.style.backgroundColor)"
+                    style="background-color:hsl(59, 100%, 61%);">Yellow</button>
+                <button id="blue" onclick="choose(this.style.backgroundColor)"
+                    style="background-color:hsl(205, 100%, 47%);">Blue</button>
+                <button id="green" onclick="choose(this.style.backgroundColor)"
+                    style="background-color:hsl(120, 100%, 32%);">Green</button>
+                <br>
+                <span>RGB</span>
+                <button id="red" onclick="choose(this.style.backgroundColor)"
+                    style="background-color:hsl(0, 100%, 50%);">Red</button>
+                <button id="yellow" onclick="choose(this.style.backgroundColor)"
+                    style="background-color:hsl(60, 100%, 50%);">Yellow</button>
+                <button id="blue" onclick="choose(this.style.backgroundColor)"
+                    style="background-color:hsl(240, 100%, 50%);">Blue</button>
+                <button id="green" onclick="choose(this.style.backgroundColor)"
+                    style="background-color:hsl(120, 100%, 50%);">Green</button>
+                <br>
+                <span>颜料</span>
+                <button id="red" onclick="choose(this.style.backgroundColor)"
+                    style="background-color:hsl(5, 79%, 51%);">Red</button>
+                <button id="yellow" onclick="choose(this.style.backgroundColor)"
+                    style="background-color:hsl(46, 96%, 48%);">Yellow</button>
+                <button id="blue" onclick="choose(this.style.backgroundColor)"
+                    style="background-color:hsl(235, 77%, 24%);">Blue</button>
+                <button id="green" onclick="choose(this.style.backgroundColor)"
+                    style="background-color:hsl(128, 94%, 27%);">Green</button>
+            </div>
+            <div>
+                <button id="white" onclick="choose(this.style.backgroundColor)"
+                    style="background-color:hsl(210, 7%, 89%); color:black;">water</button>
+                <button id="white" onclick="choose(this.style.backgroundColor)"
+                    style="background-color:hsl(67, 100%, 98%); color:black;">White</button>
+                <button id="black" onclick="choose(this.style.backgroundColor)"
+                    style="background-color:hsl(280, 100%, 2%);">Black</button>
+                <button id="mix" onclick="mixColors()" style="background-color:hsl(300, 84%, 48%);">Mix</button>
+                <br><button id="red" onclick="choose(this.style.backgroundColor)"
+                    style="background-color:rgb(210, 2, 34);">Red</button>
+                <button id="yellow" onclick="choose(this.style.backgroundColor)"
+                    style="background-color:rgb(237, 238, 59);">Yellow</button>
+                <button id="blue" onclick="choose(this.style.backgroundColor)"
+                    style="background-color:rgb(3, 68, 158);">Blue</button>
+                <button id="green" onclick="choose(this.style.backgroundColor)"
+                    style="background-color:rgb(3, 105, 68);">Green</button>
+
+                <br>
+                <button id="red" onclick="choose(this.style.backgroundColor)"
+                    style="background-color:hsl(238, 77%, 58%);"></button>
+                <button id="yellow" onclick="choose(this.style.backgroundColor)"
+                    style="background-color:hsl(186, 100%, 50%);"></button>
+                <button id="blue" onclick="choose(this.style.backgroundColor)"
+                    style="background-color:hsl(0, 77%, 24%);"></button>
+                <button id="green" onclick="choose(this.style.backgroundColor)"
+                    style="background-color:hsl(92, 78%, 47%);"></button>
+
+            </div>
+        </div>
+
+        <div id="canvas" onselectstart="return false;"></div>
+
+        <button id="clear" style="background-color:hsl(0, 100%, 50%);" onclick="clearCanvas()">Clear</button>
+        <button id="undo" style="background-color:hsl(205, 100%, 47%);" onclick="undo()">Undo</button>
+        <button id="now" style="background-color:hsl(0, 0%, 0%);">Now</button>
+        <button id="pre" onclick="choose(this.style.backgroundColor)" style="background-color:none;">Pre</button>
+        <button id="ok" onclick="submit()" style="background-color:hsl(120, 100%, 32%);">OK</button>
+    </div>
+    </div>
+    <script>
+        let currentColor = 'hsl(0, 0%, 0)';
+        let isDrawing = false;
+
+        const canvas = document.getElementById('canvas');
+        const drawnColors = [];
+        const drawnElements = [];
+
+        canvas.addEventListener('mousedown', (e) => {
+            if (e.button === 0) {
+                isDrawing = true;
+                draw(e);
+            } else if (e.button === 2) {
+                // Right-click to pick color
+                pickColor(e.clientX, e.clientY);
+            }
+        });
+
+        canvas.addEventListener('mouseup', () => {
+            isDrawing = false;
+        });
+
+        canvas.addEventListener('mousemove', (e) => {
+            if (isDrawing) {
+                draw(e);
+            }
+        });
+
+        function pickColor(x, y) {
+            const color = getPointColor(x, y);
+            choose(color);
+        }
+
+        function getRandomColor() {
+            const h = Math.floor(Math.random() * 360); // 随机生成 0 到 360 之间的 H 值
+            const s = Math.floor(Math.random() * 100); // 随机生成 0 到 100 之间的 S 值
+            const l = Math.floor(Math.random() * 100); // 随机生成 0 到 100 之间的 L 值
+            return `hsl(${h}, ${s}%, ${l}%)`;
+        }
+
+        function calculateColorSimilarity(color1, color2) {
+            const hsl1 = rgbToHsl(color1);
+            const hsl2 = rgbToHsl(color2);
+        
+            // 计算相似度，考虑色相、饱和度和亮度的不同权重
+            const hueDifference = Math.abs((Math.abs(hsl1.h - hsl2.h) + 180) % 360 - 180)*(hsl2.s+hsl1.s)/200;
+            const saturationDifference = Math.abs(hsl1.s - hsl2.s);
+            const lightnessDifference = Math.abs(hsl1.l - hsl2.l);
+            
+            //   const resultDisplay = document.getElementById('hd');
+            //   resultDisplay.textContent = 'hd: ' + Math.round(hueDifference);
+            // 应用不同分量的权重
+            const weightedDifference = 1 * hueDifference + 1*saturationDifference + 1*lightnessDifference;
+        
+            // 计算相似度，将差值归一化为0到100之间
+            const maxDifference = 360 *1 + 100*1 + 100*1; // 最大可能的差值
+            const similarityPercentage = 100 - (weightedDifference / maxDifference) * 100;
+        
+            return Math.round(similarityPercentage); // 四舍五入为整数
+        }
+        
+
+        function submit() {
+            const targetColorDisplay = document.getElementById('target-color');
+            const targetColor = targetColorDisplay.style.backgroundColor;
+
+            const similarityPercentage = calculateColorSimilarity(currentColor, targetColor);
+
+            alert(`相似度：${similarityPercentage}%`);
+            const resultDisplay = document.getElementById('ok');
+            resultDisplay.textContent = `${similarityPercentage}%`;
+        }
+
+        // 在 Reno 按钮点击事件中生成随机 target color
+        function reno() {
+            const targetColor = getRandomColor();
+            // 设置 target color 的显示
+            const targetColorDisplay = document.getElementById('target-color');
+            targetColorDisplay.style.backgroundColor = targetColor;
+            targetColorDisplay.textContent = `TC: ` + targetColor;
+
+        }
+
+
+
+        function choose(color) {
+            currentColor = color;
+            drawnColors.push(currentColor);
+            // 更新页面上的元素显示result的值
+            const resultDisplay = document.getElementById('cr');
+            const hc = rgbToHsl(currentColor);
+            resultDisplay.textContent = `cr: hsl(${hc.h.toFixed(1)}, ${hc.s.toFixed(1)}%, ${hc.l.toFixed(1)}%); ${currentColor}`;
+
+            const nowDisplay = document.getElementById('now');
+            nowDisplay.style.backgroundColor = currentColor;
+            const preDisplay = document.getElementById('pre');
+            preDisplay.style.backgroundColor = drawnColors[drawnColors.length - 2];
+        }
+
+        function mixColors() {
+            if (drawnColors.length >= 2) {
+                const result = mix(drawnColors[drawnColors.length - 1], drawnColors[drawnColors.length - 2]);
+                drawnColors.push(result);
+                currentColor = result;
+                // 更新页面上的元素显示result的值
+                const resultDisplay = document.getElementById('resultDisplay');
+                resultDisplay.textContent = 'Mix: ' + result;
+
+                document.getElementById('mix').style.backgroundColor = result;
+            }
+        }
+
+        function draw(e) {
+            if (!isDrawing) return;
+
+            const canvasRect = canvas.getBoundingClientRect();
+            const canvasLeft = canvasRect.left;
+            const canvasTop = canvasRect.top;
+            const canvasRight = canvasLeft + canvasRect.width;
+            const canvasBottom = canvasTop + canvasRect.height;
+
+            // 获取鼠标相对于画布的位置
+            const mouseX = e.clientX - canvasLeft;
+            const mouseY = e.clientY - canvasTop;
+
+            // 检查鼠标是否在画布内部
+            if (mouseX >= 0 && mouseY >= 0 && mouseX <= canvasRect.width && mouseY <= canvasRect.height) {
+                const point = document.createElement('div');
+                point.style.width = '50px';
+                point.style.height = '50px';
+
+                const existingColor = getPointColor(e.clientX, e.clientY);
+                const mixedColor = mix(currentColor, existingColor);
+                currentColor = mixedColor;
+                point.style.backgroundColor = currentColor;
+                // point.style.backgroundImage = 'url("ggyy.png")';
+                point.style.borderRadius = '50%';
+                point.style.position = 'absolute';
+                point.style.left = (e.clientX - 25) + 'px';
+                point.style.top = (e.clientY - 25) + 'px';
+
+                canvas.appendChild(point);
+
+                // 更新页面上的元素显示result的值
+                const resultDisplay = document.getElementById('cr');
+                const hc = rgbToHsl(currentColor);
+                resultDisplay.textContent = `cr: hsl(${hc.h.toFixed(1)}, ${hc.s.toFixed(1)}%, ${hc.l.toFixed(1)}%); ${currentColor}`;
+                const nowDisplay = document.getElementById('now');
+                nowDisplay.style.backgroundColor = currentColor;
+            }
+        }
+
+        function getPointColor(x, y) {
+            const elements = document.elementsFromPoint(x, y);
+            for (const element of elements) {
+                if (element.style.backgroundColor !== "") {
+                    return element.style.backgroundColor;
+                }
+            }
+            return currentColor; // 默认颜色，可以根据需要修改
+        }
+
+        function mix(color1, color2) {
+            if (color1 === color2) {
+                return color1; // 相同颜色混合不改变
+            }
+            
+            const hsl1 = rgbToHsl(color1);
+            const hsl2 = rgbToHsl(color2);
+
+            const h1 = hsl1.h;
+            const s1 = hsl1.s;
+            const l1 = hsl1.l;
+
+            const h2 = hsl2.h;
+            const s2 = hsl2.s;
+            const l2 = hsl2.l;
+
+            // 计算新的HSL颜色，确保它位于两个输入颜色的hue之间
+            let h = (h1 + h2) / 2 ;
+            if (Math.abs(h1 - h2) > 200) {
+                // 如果两个颜色的hue相差超过180度，则需要调整h值
+                h += 180;
+
+            }
+            if (l1 == 100 || s1 == 0) {
+                h = h2;
+            }
+            if (l2 == 100 || s2 == 0) {
+                h = h1;
+            }
+
+            let s = (s1 + s2) / 2 ;
+            let l = (l1 + l2) / 2 ;
+
+            // 确保 H、S、L 值在合理范围内
+            h = (h < 0) ? h + 360 : (h >= 360) ? h - 360 : h;
+            s = Math.min(Math.max(s, 0), 100);
+            l = Math.min(Math.max(l, 0), 100);
+
+            const result1 = hslToRgb(h / 360, s / 100, l / 100);
+
+            const rgb1 = color1.match(/(\d+(\.\d+)?)/g);
+            const rgb2 = color2.match(/(\d+(\.\d+)?)/g);
+
+            const r1 = parseInt(rgb1[0]);
+            const g1 = parseInt(rgb1[1]);
+            const b1 = parseInt(rgb1[2]);
+
+            const r2 = parseInt(rgb2[0]);
+            const g2 = parseInt(rgb2[1]);
+            const b2 = parseInt(rgb2[2]);
+            /*
+            const r = (r1 + r2) / 2;
+            const g = (g1 + g2) / 2;
+            const b = (b1 + b2) / 2;
+            */
+            const cmyk1 = rgbToCmyk(r1, g1, b1);
+            const cmyk2 = rgbToCmyk(r2, g2, b2);
+
+            const c1 = Math.min(1, cmyk1.c + cmyk2.c);
+            const m1 = Math.min(1, cmyk1.m + cmyk2.m);
+            const y1 = Math.min(1, cmyk1.y + cmyk2.y);
+            const k1 = Math.min(1, cmyk1.k + cmyk2.k);
+            
+            const c2 = (cmyk1.c + cmyk2.c) / 2;
+            const m2 = (cmyk1.m + cmyk2.m) / 2;
+            const y2 = (cmyk1.y + cmyk2.y) / 2;
+            const k2 = (cmyk1.k + cmyk2.k) / 2;
+            
+            const c = (c1 + c2) / 2;
+            const m = (m1 + m2) / 2;
+            const y = (y1 + y2) / 2;
+            const k = (k1+ k2) / 2;
+
+            const { r, g, b } = cmykToRgb(c, m, y, k);
+
+            const result2 = `rgb(${Math.round(r)}, ${Math.round(g)}, ${Math.round(b)})`;
+
+           const result =avgRGB(result1,result2);
+
+            // 更新页面上的元素显示result的值
+/*
+            const resultDisplay = document.getElementById('c1');
+            resultDisplay.textContent = `color1: hsl(${h1.toFixed(1)}, ${s1.toFixed(1)}%, ${l1.toFixed(1)}%); ` + color1;
+            const resultDisplay2 = document.getElementById('c2');
+            resultDisplay2.textContent = `color2: hsl(${h2.toFixed(1)}, ${s2.toFixed(1)}%, ${l2.toFixed(1)}%); ` + color2;
+            const resultDisplay3 = document.getElementById('resultDisplay');
+            resultDisplay3.textContent = `mix: hsl(${h.toFixed(1)}, ${s.toFixed(1)}%, ${l.toFixed(1)}%); ` + result;
+*/
+
+            return result;
+        }
+        function avgRGB(color1,color2){
+            const rgb1 = color1.match(/(\d+(\.\d+)?)/g);
+            const rgb2 = color2.match(/(\d+(\.\d+)?)/g);
+
+            const r1 = parseInt(rgb1[0]);
+            const g1 = parseInt(rgb1[1]);
+            const b1 = parseInt(rgb1[2]);
+
+            const r2 = parseInt(rgb2[0]);
+            const g2 = parseInt(rgb2[1]);
+            const b2 = parseInt(rgb2[2]);
+            
+            const r = (r1 + r2) / 2;
+            const g = (g1 + g2) / 2;
+            const b = (b1 + b2) / 2;
+
+            return `rgb(${Math.round(r)}, ${Math.round(g)}, ${Math.round(b)})`;
+        }
+        function rgbToCmyk(r, g, b) {
+            r /= 255;
+            g /= 255;
+            b /= 255;
+
+            const k = 1 - Math.max(r, g, b);
+            const c = (1 - r - k) / (1 - k);
+            const m = (1 - g - k) / (1 - k);
+            const y = (1 - b - k) / (1 - k);
+
+            return { c, m, y, k };
+        }
+
+        function cmykToRgb(c, m, y, k) {
+            const r = 255 * (1 - c) * (1 - k);
+            const g = 255 * (1 - m) * (1 - k);
+            const b = 255 * (1 - y) * (1 - k);
+
+            return { r, g, b };
+        }
+        function grayScale(rgbColor) {
+            // 解析 RGB 颜色字符串，例如 "rgb(255, 128, 64)"
+            const match = rgbColor.match(/(\d+(\.\d+)?)/g);
+        
+            if (match) {
+                // 从正则表达式匹配中获取 R、G 和 B 分量
+                const r = parseInt(match[1], 10);
+                const g = parseInt(match[2], 10);
+                const b = parseInt(match[3], 10);
+        
+                // 计算灰度值
+                const grayscale = 0.299 * r + 0.587 * g + 0.114 * b;
+        
+                return Math.round(grayscale); // 四舍五入为整数
+            }
+        
+            return 128; // 如果解析失败，返回 null 或适当的默认值
+        }
+
+        function rgbToHsl(rgbColor) {
+            const rgb = rgbColor.match(/(\d+(\.\d+)?)/g);
+
+            const r = rgb[0] / 255;
+            const g = rgb[1] / 255;
+            const b = rgb[2] / 255;
+
+            const max = Math.max(r, g, b);
+            const min = Math.min(r, g, b);
+
+            let h, s, l = (max + min) / 2;
+
+            if (max === min) {
+                h = s = 0; // achromatic
+            } else {
+                const d = max - min;
+                s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+
+                switch (max) {
+                    case r:
+                        h = (g - b) / d + (g < b ? 6 : 0);
+                        break;
+                    case g:
+                        h = (b - r) / d + 2;
+                        break;
+                    case b:
+                        h = (r - g) / d + 4;
+                        break;
+                }
+
+                h /= 6;
+            }
+
+            return { h: h * 360, s: s * 100, l: l * 100 };
+        }
+
+        function hslToRgb(h, s, l) {
+            let r, g, b;
+
+            if (s === 0) {
+                r = g = b = l; // achromatic
+            } else {
+                const hue2rgb = (p, q, t) => {
+                    if (t < 0) t += 1;
+                    if (t > 1) t -= 1;
+                    if (t < 1 / 6) return p + (q - p) * 6 * t;
+                    if (t < 1 / 2) return q;
+                    if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+                    return p;
+                };
+
+                const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+                const p = 2 * l - q;
+
+                r = hue2rgb(p, q, h + 1 / 3);
+                g = hue2rgb(p, q, h);
+                b = hue2rgb(p, q, h - 1 / 3);
+            }
+
+            r = Math.round(r * 255);
+            g = Math.round(g * 255);
+            b = Math.round(b * 255);
+
+            return `rgb(${r}, ${g}, ${b})`;
+        }
+
+        function clearCanvas() {
+            canvas.innerHTML = '';
+            drawnColors.length = 0;
+            drawnElements.length = 0;
+        }
+
+        function undo() {
+            if (drawnElements.length > 0) {
+                canvas.removeChild(drawnElements.pop());
+                drawnColors.pop();
+                if (drawnColors.length > 0) {
+                    currentColor = drawnColors[drawnColors.length - 1];
+                }
+            }
+        }
+    </script>
+</body>
+
+</html>
